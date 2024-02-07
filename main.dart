@@ -1,149 +1,122 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(Uwu());
 }
 
-class MyApp extends StatelessWidget {
-  //build widget UI
+class Uwu extends StatelessWidget{
   @override
   Widget build(BuildContext context){
-    var m = MaterialApp(
-      title: 'Image demo app',
+    return MaterialApp(
+      title: 'UwU',
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        primarySwatch: Colors.pink
       ),
-      home: MyHomePage(title: 'image demo'),
+      home: MyChatBot(title: 'Advisor Chatbot'),
     );
-    return m;
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-  final String title;
+class MyChatBot extends StatelessWidget{
+  MyChatBot({Key? key, required this.title}):  super(key: key);
+  final String title; 
+
   @override
-  Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(title: Text("Product Listing")),
+  Widget build(BuildContext context){
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(title, style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.pink,
+      ),
       body: ListView(
         shrinkWrap: true,
-        padding: const EdgeInsets.fromLTRB(2.0, 10.0, 2.0, 10.0),
-        children: <Widget>[
-          ProductBox(
-            name: "iPhone",
-            description: "iPhone is the stylist phone ever",
-            price: 1000,
-            image: "assets/appimages/iphone.jpeg"),
-          ProductBox(
-            name: "Pixel",
-            description: "Pixel is the most featureful phone ever",
-            price: 800,
-            image: "assets/appimages/pixel.png"),
-          ProductBox(
-            name: "Laptop",
-            description: "Laptop is most productive development tool",
-            price: 2000,
-            image: "assets/appimages/laptop.jpg"),
-          ProductBox2(
-            name: "Tablet",
-            description: "Tablet is the most useful device ever for meeting",
-            price: 1500,
-            image: "https://p4-ofp.static.pub/fes/cms/2023/03/28/7dch8vg9lz0tzeg74u3x9paoln4o8z319478.png"),
-          ProductBox2(
-            name: "Pendrive",
-            description: "Pendrive is useful storage medium",
-            price: 100,
-            image: "https://5.imimg.com/data5/HG/HZ/YJ/SELLER-7527235/cruzer-blade-16gb-pen-drive-500x500-500x500.jpg"),
-          ProductBox2(
-            name: "Floppy Drive",
-            description: "Floppy drive is useful rescue storage medium",
-            price: 20,
-            image: "https://static.javatpoint.com/computer/images/what-is-a-floppy-disk.png"),
+        children: <Widget> [
+          Container(
+            height: 90,
+            width: 90,
+            child: Image.network('https://www.pinclipart.com/picdir/big/496-4960292_nerd-transparent-svg-nerd-emoji-twitter-clipart.png'),
+            padding: EdgeInsets.all(5)
+          ),
+          Center(child: Text('Pet Guru')),
+          Reply(word: 'Greeting! How can I help you today?'),
+          ChatBox(word: 'How do I take care of pet rock?'),
+          Reply(word: 'Great question! Here are some simple steps you can follow:\n 1.Keep your pet rock clean\n 2.Keep your pet rock dry\n 3.Give your pet rock a comfortable home\n 4.Play with your pet rock\n 5.Protect your pet rock'),
+          ChatBox(word: 'Thanks!')
+        ]
+      ),
+      bottomSheet: Container(
+        padding: EdgeInsets.all(2),
+        height: 50,
+        child:  Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              'type something ',
+              style:TextStyle(color: Colors.grey)
+            ),
+            ElevatedButton(
+              style: const ButtonStyle(
+                backgroundColor: MaterialStatePropertyAll<Color>(Colors.pinkAccent),
+              ),
+              child: Text('Ask',style:TextStyle(color: Colors.white)),
+              onPressed:null,
+            )
+          ]
+        ) 
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            
+            icon: Icon(Icons.question_answer),
+            label: 'Ask',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: 'About us',
+          )
         ],
-    ));
+        currentIndex: 1,
+        selectedItemColor: Colors.white,
+        backgroundColor: Colors.pink,
+      )
+    );
   }
 }
 
-class ProductBox extends StatelessWidget {
- ProductBox({Key? key, required this.name, required this.description, required this.price, required this.image})
- : super(key: key);
- final String name;
- final String description;
- final int price;
- final String image;
- Widget build(BuildContext context) {
+class ChatBox extends StatelessWidget{
+  ChatBox({Key? key, required this.word}) : super(key: key);
+
+  final String word;
+
+  Widget build(BuildContext context){
     return Container(
-      padding: EdgeInsets.all(2),
-      height: 120,
-      child: Card(
-      child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: <Widget>[
-      Image.asset(image),
-      Expanded(
-      child: Container(
-      padding: EdgeInsets.all(5),
-      child: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: <Widget>[
-      Text(this.name,
-      style: TextStyle(fontWeight:
-      FontWeight.bold)),
-      Text(this.description),
-      Text("Price: " + this.price.toString()),
-      ],
-      )))
-      ])));
- }
+      padding: EdgeInsets.fromLTRB(20, 2, 20, 2),
+      child:  Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [Card(child:Container(padding:EdgeInsets.all(10), child: Text(word)),color: Colors.white,),]
+      ) 
+    );
+  }
 }
 
-class ProductBox2 extends StatelessWidget {
- ProductBox2({Key? key, required this.name, required this.description, required this.price, required this.image})
- : super(key: key);
- final String name;
- final String description;
- final int price;
- final String image;
- Widget build(BuildContext context) {
+class Reply extends StatelessWidget{
+  Reply({Key? key, required this.word}) : super(key: key);
+
+  final String word;
+
+  Widget build(BuildContext context){
     return Container(
-      padding: EdgeInsets.all(2),
-      height: 120,
-      child: Card(
-      child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: <Widget>[
-      Image.network(image),
-      Expanded(
-      child: Container(
-      padding: EdgeInsets.all(5),
-      child: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: <Widget>[
-      Text(this.name,
-      style: TextStyle(fontWeight:
-      FontWeight.bold)),
-      Text(this.description),
-      Text("Price: " + this.price.toString()),
-      ],
-      )))
-      ])));
- }
+      padding: EdgeInsets.fromLTRB(20, 2, 20, 2),
+      child:  Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [Card(child:Container(padding:EdgeInsets.all(10), child: Text(word,style: TextStyle(color: Colors.white),),),color: Colors.pinkAccent,)]
+      ) 
+    );
+  }
 }
-
-// class MyHomePage extends StatelessWidget{
-//   MyHomePage({Key? key, required this.title}) : super(key: key);
-
-//   final String title;
-//   @override
-//   Widget build(BuildContext context){
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(this.title),
-//       ),
-//       // body: Center(child: Image.asset('assets/appimages/laptop.png')),
-//       body: Center(child: Image.network('https://mahidol.ac.th/temp/2019/06/logo-MU_Color.png')),
-//     );
-//   }
-
-// }
