@@ -1,122 +1,117 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:async';
+//import 'dart:js';
 
-void main() {
-  runApp(Uwu());
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+Future<Album> createAlbum(String title) async {
+  final response = await http.post(
+    Uri.parse('https://jsonplaceholder.typicode.com/albums'),
+    headers: <String, String>{
+      'Contennt-Type': 'applicant/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String,String>{
+      'title': title,
+    }),
+  );
+
+  if(response.statusCode == 201) {
+    return Album.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+  } else{
+    throw Exception('Failed to create album');
+  }
 }
 
-class Uwu extends StatelessWidget{
+class Album{
+  final int id;
+  final String title;
+
+  const Album({required this.id, required this.title});
+
+  factory Album.fromJson(Map<String, dynamic> json){
+    return switch(json){
+      {
+        'id': int id,
+        'title': String title,
+      } =>
+        Album(
+          id: id, 
+          title: title,
+        ),
+        _ => throw const FormatException('Failed to load album.'),
+    };
+  }
+}
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState(){
+    return _MyAppState();
+  }
+}
+
+class _MyAppState extends State<MyApp>{
+  final TextEditingController _controller = TextEditingController();
+  Future<Album>? _futureAlbum;
+
   @override
   Widget build(BuildContext context){
     return MaterialApp(
-      title: 'UwU',
+      title: 'Create Data Example',
       theme: ThemeData(
-        primarySwatch: Colors.pink
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: MyChatBot(title: 'Advisor Chatbot'),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Create Data Example'),
+        ),
+        body: Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(8),
+          child: (_futureAlbum == null)? buildColumn(): buildFutureBuilder(),
+        ),
+      ),
     );
   }
-}
 
-class MyChatBot extends StatelessWidget{
-  MyChatBot({Key? key, required this.title}):  super(key: key);
-  final String title; 
-
-  @override
-  Widget build(BuildContext context){
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(title, style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.pink,
-      ),
-      body: ListView(
-        shrinkWrap: true,
-        children: <Widget> [
-          Container(
-            height: 90,
-            width: 90,
-            child: Image.network('https://www.pinclipart.com/picdir/big/496-4960292_nerd-transparent-svg-nerd-emoji-twitter-clipart.png'),
-            padding: EdgeInsets.all(5)
-          ),
-          Center(child: Text('Pet Guru')),
-          Reply(word: 'Greeting! How can I help you today?'),
-          ChatBox(word: 'How do I take care of pet rock?'),
-          Reply(word: 'Great question! Here are some simple steps you can follow:\n 1.Keep your pet rock clean\n 2.Keep your pet rock dry\n 3.Give your pet rock a comfortable home\n 4.Play with your pet rock\n 5.Protect your pet rock'),
-          ChatBox(word: 'Thanks!')
-        ]
-      ),
-      bottomSheet: Container(
-        padding: EdgeInsets.all(2),
-        height: 50,
-        child:  Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              'type something ',
-              style:TextStyle(color: Colors.grey)
-            ),
-            ElevatedButton(
-              style: const ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll<Color>(Colors.pinkAccent),
-              ),
-              child: Text('Ask',style:TextStyle(color: Colors.white)),
-              onPressed:null,
-            )
-          ]
-        ) 
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            
-            icon: Icon(Icons.question_answer),
-            label: 'Ask',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'About us',
-          )
-        ],
-        currentIndex: 1,
-        selectedItemColor: Colors.white,
-        backgroundColor: Colors.pink,
-      )
+  Column buildColumn(){
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        TextField(
+          controller:  _controller,
+          decoration: const InputDecoration(hintText: 'Enter Title'),
+        ),
+        ElevatedButton(
+          onPressed: (){
+            setState((){
+              _futureAlbum = createAlbum(_controller.text);
+            });
+          }, 
+          child: const Text('Create Data'),
+        )
+      ],
     );
   }
-}
 
-class ChatBox extends StatelessWidget{
-  ChatBox({Key? key, required this.word}) : super(key: key);
-
-  final String word;
-
-  Widget build(BuildContext context){
-    return Container(
-      padding: EdgeInsets.fromLTRB(20, 2, 20, 2),
-      child:  Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [Card(child:Container(padding:EdgeInsets.all(10), child: Text(word)),color: Colors.white,),]
-      ) 
-    );
-  }
-}
-
-class Reply extends StatelessWidget{
-  Reply({Key? key, required this.word}) : super(key: key);
-
-  final String word;
-
-  Widget build(BuildContext context){
-    return Container(
-      padding: EdgeInsets.fromLTRB(20, 2, 20, 2),
-      child:  Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [Card(child:Container(padding:EdgeInsets.all(10), child: Text(word,style: TextStyle(color: Colors.white),),),color: Colors.pinkAccent,)]
-      ) 
+  FutureBuilder<Album> buildFutureBuilder(){
+    return FutureBuilder<Album>(
+      future: _futureAlbum,
+      builder: (context, snapshot){
+        if(snapshot.hasData){
+          return Text(snapshot.data!.title);
+        }else if (snapshot.hasError){
+          return Text('${snapshot.error}');
+        }
+        return const CircularProgressIndicator();
+      },
     );
   }
 }
